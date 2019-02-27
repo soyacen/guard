@@ -1,0 +1,31 @@
+# Port to listen on for guard service (default is 8080)
+port: 9000
+
+# use https
+https: false
+
+# File containing the default x509 Certificate for HTTPS.
+tls-cert-file:
+
+# File containing the default x509 private key matching --tls-cert-file
+tls-private-key-file:
+
+# Username pattern, Used to check the legality of the username
+username-pattern: ^\w{6,24}$
+# Password pattern, Used to check the legality of the password
+password-pattern: ^\w{6,24}$
+
+# Database driver name.
+driver: mysql
+# The Data Source Name. format [username[:password]@][protocol[(address)]]/dbname[?param1=value1&...&paramN=valueN]
+dns: root:jax12345@/account?charset=utf8
+
+# redis addr
+redis: localhost:6379
+# redis password
+redis-pwd:
+# redis db
+redis-db: 0
+
+# jwt private key file
+jwt-key-file: /home/jax/Projects/golang/guard/sefile/jwtRS512.key

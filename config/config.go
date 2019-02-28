@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 	"github.com/yacen/guard/util/log"
 )
@@ -22,7 +24,10 @@ type Config struct {
 	RedisPwd  string
 	RedisDB   int
 
-	JwtKeyFile string
+	JwtPrivateKeyFile string
+	JwtPublickKeyFile string
+
+	TokenExpiresIn time.Duration
 }
 
 var Cfg Config
@@ -39,6 +44,8 @@ func GetFlagsFromConfigFile() {
 	Cfg.RedisAddr = viper.GetString("redis")
 	Cfg.RedisPwd = viper.GetString("redis-pwd")
 	Cfg.RedisDB = viper.GetInt("redis-db")
-	Cfg.JwtKeyFile = viper.GetString("jwt-key-file")
+	Cfg.JwtPrivateKeyFile = viper.GetString("jwt-private-key-file")
+	Cfg.JwtPublickKeyFile = viper.GetString("jwt-public-key-file")
+	Cfg.TokenExpiresIn = viper.GetDuration("token-expires-in")
 	log.Println(Cfg)
 }

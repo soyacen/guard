@@ -3,12 +3,13 @@ package service
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"time"
+
+	"github.com/yacen/guard/config"
 
 	"github.com/yacen/guard/util"
 
-	"github.com/SermoDigital/jose/crypto"
-
-	"github.com/SermoDigital/jose/jws"
+	"github.com/dgrijalva/jwt-go"
 
 	"github.com/yacen/guard/model"
 
@@ -18,18 +19,18 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func SignIn(username, password string) (token []byte, err error) {
+func SignIn(username, password string) (token string, err error) {
 	// redis 里是否存在
 	exists, err := db.Redis.SIsMember(db.KeyUsernameSet, username).Result()
 	if err != nil {
 		log.Error(err)
-		err = resp.NewError(resp.SignIn, "sign in failed")
+		err = resp.NewError(resp.SignInError, "sign in failed")
 		return
 	}
 	// 不存在就返回错误
 	if !exists {
 		log.Error("username not exists in redis")
-		err = resp.NewError(resp.SignIn, "please sign up")
+		err = resp.NewError(resp.SignInError, "please sign up")
 		return
 	}
 
@@ -37,16 +38,16 @@ func SignIn(username, password string) (token []byte, err error) {
 	accounts, err := model.FindAccountsByUsername(username)
 	if err != nil {
 		log.Error(err)
-		err = resp.NewError(resp.SignIn, "sign in failed")
+		err = resp.NewError(resp.SignInError, "sign in failed")
 		return
 	}
 	if len(accounts) <= 0 {
 		log.Error("username not exists in database")
-		err = resp.NewError(resp.SignIn, "please sign up")
+		err = resp.NewError(resp.SignInError, "please sign up")
 		return
 	} else if len(accounts) > 1 {
 		log.Error("There are multiple usernames")
-		err = resp.NewError(resp.SignIn, "sign in failed")
+		err = resp.NewError(resp.SignInError, "sign in failed")
 		return
 	}
 	account := accounts[0]
@@ -57,20 +58,40 @@ func SignIn(username, password string) (token []byte, err error) {
 
 	if sePwd != account.Password {
 		log.Error("password wrong")
-		err = resp.NewError(resp.SignIn, "sign in failed")
+		err = resp.NewError(resp.SignInError, "sign in failed")
 		return
 	}
-	claims := jws.Claims{
-		"username": account.Username,
-		"phone":    account.Phone,
-		"email":    account.Email,
-	}
-	jwt := jws.NewJWT(claims, crypto.SigningMethodRS512)
 
-	token, err = jwt.Serialize(util.RsaPriv)
+	type UserClaims struct {
+		User  string `json:"user"`
+		Phone string `json:"phone"`
+		Email string `json:"email"`
+		jwt.StandardClaims
+	}
+
+	now := time.Now()
+	expiresIn := time.Millisecond * config.Cfg.TokenExpiresIn
+	claims := UserClaims{
+		User:  account.Username,
+		Phone: account.Phone,
+		Email: account.Email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: now.Add(expiresIn).Unix(),
+			IssuedAt:  now.Unix(),
+		},
+	}
+	token, err = jwt.NewWithClaims(jwt.SigningMethodRS512, claims).SignedString(util.RsaPriv)
 	if err != nil {
 		log.Error("generate token error,", err)
-		err = resp.NewError(resp.SignIn, "sign in failed")
+		err = resp.NewError(resp.SignInError, "sign in failed")
+		return
 	}
+	/*	// 存入redis
+		_, err = db.Redis.Set(db.KeyUsernameToken(username), token, expiresIn).Result()
+		if err != nil {
+			log.Error("save token on redis failed,", err)
+			err = resp.NewError(resp.SignInError, "sign in failed")
+			return
+		}*/
 	return
 }

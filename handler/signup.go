@@ -22,7 +22,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "parse form error")
+		util.WriteMessage(w, resp.ParseFromError, "parse form error")
 		return
 	}
 
@@ -30,12 +30,12 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	ok, err := regexp.MatchString(config.Cfg.UsernamePattern, username)
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "match username error")
+		util.WriteMessage(w, resp.ParseFromError, "match username error")
 		return
 	}
 	if !ok {
 		log.Println("check username error")
-		util.WriteMessage(w, resp.ParseFrom, "check username error")
+		util.WriteMessage(w, resp.RegexpError, "check username error")
 		return
 	}
 
@@ -43,16 +43,16 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	ok, err = regexp.MatchString(config.Cfg.PasswordPattern, password)
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "match password error")
+		util.WriteMessage(w, resp.ParseFromError, "match password error")
 		return
 	}
 	if !ok {
-		util.WriteMessage(w, resp.ParseFrom, "check password error")
+		util.WriteMessage(w, resp.RegexpError, "check password error")
 		return
 	}
 	err = service.SignUp(username, password)
 	if err != nil {
-		util.WriteError(w, resp.NewError(resp.SignUp, err.Error()))
+		util.WriteError(w, resp.NewError(resp.SignUpError, err.Error()))
 	} else {
 		util.WriteMessage(w, resp.SUCCESS, "create success")
 	}

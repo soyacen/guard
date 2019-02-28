@@ -24,7 +24,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "parse form error")
+		util.WriteMessage(w, resp.ParseFromError, "parse form error")
 		return
 	}
 
@@ -32,12 +32,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	ok, err := regexp.MatchString(config.Cfg.UsernamePattern, username)
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "match username error")
+		util.WriteMessage(w, resp.ParseFromError, "match username error")
 		return
 	}
 	if !ok {
 		log.Println("check username error")
-		util.WriteMessage(w, resp.ParseFrom, "check username error")
+		util.WriteMessage(w, resp.RegexpError, "check username error")
 		return
 	}
 
@@ -45,18 +45,18 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	ok, err = regexp.MatchString(config.Cfg.PasswordPattern, password)
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "match password error")
+		util.WriteMessage(w, resp.ParseFromError, "match password error")
 		return
 	}
 	if !ok {
-		util.WriteMessage(w, resp.ParseFrom, "check password error")
+		util.WriteMessage(w, resp.RegexpError, "check password error")
 		return
 	}
-
 	token, err := service.SignIn(username, password)
+	log.Println(username, password, string(token))
 	if err != nil {
 		log.Error(err)
-		util.WriteMessage(w, resp.ParseFrom, "sign in failed")
+		util.WriteMessage(w, resp.ParseFromError, "sign in failed")
 		return
 	}
 	util.WriteData(w, resp.Token{Token: string(token)})

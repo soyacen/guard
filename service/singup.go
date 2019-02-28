@@ -13,17 +13,16 @@ import (
 )
 
 func SignUp(username, password string) (err error) {
-
 	// check redis
 	exists, err := db.Redis.SIsMember(db.KeyUsernameSet, username).Result()
 	if err != nil {
 		log.Error(err)
-		err = resp.NewError(resp.SignUp, "create account failed")
+		err = resp.NewError(resp.SignUpError, "create account failed")
 		return
 	}
 	if exists {
 		log.Error("username exists in redis")
-		err = resp.NewError(resp.SignUp, "username already exists")
+		err = resp.NewError(resp.SignUpError, "username already exists")
 		return
 	}
 
@@ -31,7 +30,7 @@ func SignUp(username, password string) (err error) {
 	salt, err := uuid.New().MarshalText()
 	if err != nil {
 		log.Error(err)
-		err = resp.NewError(resp.SignUp, "create account failed")
+		err = resp.NewError(resp.SignUpError, "create account failed")
 		return
 	}
 	sePwd := hex.EncodeToString(pbkdf2.Key([]byte(password), salt, 4096, 32, sha1.New))
@@ -40,7 +39,7 @@ func SignUp(username, password string) (err error) {
 	err = model.CreateAccount(username, sePwd, string(salt))
 	if err != nil {
 		log.Error(err)
-		err = resp.NewError(resp.SignUp, "create account failed")
+		err = resp.NewError(resp.SignUpError, "create account failed")
 		return
 	}
 

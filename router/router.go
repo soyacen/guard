@@ -1,8 +1,9 @@
 package router
 
 import (
-	"github.com/yacen/guard/handler"
 	"net/http"
+
+	"github.com/yacen/guard/handler"
 )
 
 func NewRouter() http.Handler {
@@ -19,6 +20,9 @@ func NewRouter() http.Handler {
 
 	// 退出
 	mux.HandleFunc("/signout", handler.SignOut)
+
+	// 验证
+	mux.HandleFunc("/verify", handler.Verify)
 
 	return mux
 }

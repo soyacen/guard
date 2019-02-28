@@ -4,12 +4,12 @@ require (
 	4d63.com/gochecknoglobals v0.0.0-20190118042838-abbdf6ec0afb // indirect
 	4d63.com/gochecknoinits v0.0.0-20180528051558-14d5915061e5 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect
-	github.com/SermoDigital/jose v0.9.1
 	github.com/alecthomas/gocyclo v0.0.0-20150208221726-aa8f8b160214 // indirect
 	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
 	github.com/alexflint/go-arg v1.0.0 // indirect
 	github.com/alexkohler/nakedret v0.0.0-20171106223215-c0e305a4f690 // indirect
 	github.com/client9/misspell v0.3.4 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis v6.15.1+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1 // indirect

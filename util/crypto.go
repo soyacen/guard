@@ -2,26 +2,34 @@ package util
 
 import (
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"fmt"
 	"io/ioutil"
 
-	"github.com/yacen/guard/config"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/yacen/guard/util/log"
+
+	"github.com/yacen/guard/config"
 )
 
 var RsaPriv *rsa.PrivateKey
+var RsaPub *rsa.PublicKey
 
 func InitJwtKeyFile() {
-	der, err := ioutil.ReadFile(config.Cfg.JwtKeyFile)
+	Der, err := ioutil.ReadFile(config.Cfg.JwtPrivateKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	block, _ := pem.Decode(der)
-	RsaPriv, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+	RsaPriv, err = jwt.ParseRSAPrivateKeyFromPEM(Der)
 	if err != nil {
-		fmt.Println(err)
 		log.Fatal(err)
 	}
+
+	Der, err = ioutil.ReadFile(config.Cfg.JwtPublickKeyFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	RsaPub, err = jwt.ParseRSAPublicKeyFromPEM(Der)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }

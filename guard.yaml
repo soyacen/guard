@@ -28,4 +28,8 @@ redis-pwd:
 redis-db: 0
 
 # jwt private key file
-jwt-key-file: /home/jax/Projects/golang/guard/sefile/jwtRS512.key
+jwt-private-key-file: /home/jax/Projects/golang/guard/sefile/jwtRS512.key
+jwt-public-key-file: /home/jax/Projects/golang/guard/sefile/jwtRS512.key.pub
+
+# expires at, Millisecond
+token-expires-in:  60000

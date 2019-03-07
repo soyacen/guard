@@ -13,3 +13,4 @@
 将删除 .idea/
 /.idea/*.xml
 /main
+.idea
